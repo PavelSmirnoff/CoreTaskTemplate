@@ -1,7 +1,5 @@
 package jm.task.core.jdbc.util;
 
-import com.mysql.fabric.jdbc.FabricMySQLDriver;
-
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
@@ -17,19 +15,16 @@ public class Util {
     public static Connection getConnection() {
 
         if (connection == null) {
-            Driver driver;
-            {
-                try {
-                    driver = new FabricMySQLDriver();
-                    DriverManager.deregisterDriver(driver);
-                    connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-                    if(!connection.isClosed()){
-                        System.out.println("Соединение с БД установленно");
-                    }
-                } catch (SQLException throwables) {
-                    System.out.println("Не удалось загрузить драйвер");
+            try {
+                Class.forName("com.mysql.jdbc.Driver");
+                connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+                if (!connection.isClosed()) {
+                    System.out.println("Соединение с БД установленно");
                 }
+            } catch (SQLException | ClassNotFoundException e) {
+                System.out.println("Не удалось загрузить драйвер. " + e);
             }
+
         }
         return connection;
     }
