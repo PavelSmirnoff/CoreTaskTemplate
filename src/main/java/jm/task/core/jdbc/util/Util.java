@@ -13,18 +13,13 @@ public class Util {
     private static final String PASSWORD = "12345678";
 
     public static Connection getConnection() {
-
         if (connection == null) {
             try {
-                Class.forName("com.mysql.jdbc.Driver");
+                Class.forName("com.mysql.cj.jdbc.Driver");
                 connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-                if (!connection.isClosed()) {
-                    System.out.println("Соединение с БД установленно");
-                }
             } catch (SQLException | ClassNotFoundException e) {
-                System.out.println("Не удалось загрузить драйвер. " + e);
+                System.out.println("Не удалось создать подключение к БД. " + e);
             }
-
         }
         return connection;
     }

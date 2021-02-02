@@ -25,6 +25,7 @@ public class UserDaoJDBCImpl implements UserDao {
                     "PRIMARY KEY (id)); ";
             statement.execute(sql);
         } catch (SQLException e) {
+            System.out.println("Ошибка создания таблицы. " + e);
         }
     }
 
@@ -33,6 +34,7 @@ public class UserDaoJDBCImpl implements UserDao {
             String sql = "DROP TABLE IF EXISTS Users;";
             statement.execute(sql);
         } catch (SQLException e) {
+            System.out.println("Ошибка уделения таблицы. " + e);
         }
     }
 
@@ -43,7 +45,9 @@ public class UserDaoJDBCImpl implements UserDao {
             preparedStmt.setString(2, lastName);
             preparedStmt.setInt(3, age);
             preparedStmt.execute();
+            System.out.printf("User с именем – %s добавлен в базу данных.\n", name);
         } catch (SQLException e) {
+            System.out.println("Ошибка добавления User в БД. " + e);
         }
     }
 
@@ -52,6 +56,7 @@ public class UserDaoJDBCImpl implements UserDao {
             String sql = "DELETE FROM Users WHERE ID=" + id + ";";
             statement.execute(sql);
         } catch (SQLException e) {
+            System.out.println("Ошибка уделения User с id=" + id + " из БД. " + e);
         }
     }
 
@@ -71,6 +76,7 @@ public class UserDaoJDBCImpl implements UserDao {
                 users.add(user);
             }
         } catch (SQLException e) {
+            System.out.println("Ошибка получения списка Users. " + e);
         }
         return users;
     }
@@ -80,6 +86,7 @@ public class UserDaoJDBCImpl implements UserDao {
             String sql = "TRUNCATE TABLE Users;";
             statement.execute(sql);
         } catch (SQLException e) {
+            System.out.println("Ошибка очистки данных в таблице. " + e);
         }
     }
 }
