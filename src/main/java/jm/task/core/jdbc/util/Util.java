@@ -17,6 +17,7 @@ public class Util {
             try {
                 Class.forName("com.mysql.cj.jdbc.Driver");
                 connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+                connection.setAutoCommit(false);
             } catch (SQLException | ClassNotFoundException e) {
                 System.out.println("Не удалось создать подключение к БД. " + e);
             }
