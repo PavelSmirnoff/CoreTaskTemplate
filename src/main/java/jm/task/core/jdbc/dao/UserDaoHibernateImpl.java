@@ -7,12 +7,10 @@ import org.hibernate.Transaction;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
 public class UserDaoHibernateImpl implements UserDao {
-    Session session = Util.getSessionFactory().openSession();
     Transaction transaction = null;
 
     public UserDaoHibernateImpl() {
@@ -21,7 +19,8 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void createUsersTable() {
-        try {
+
+        try (Session session = Util.getSessionFactory().openSession()){
             transaction = session.beginTransaction();
             String sql = "CREATE TABLE IF NOT EXISTS Users ( " +
                     "id BIGINT NOT NULL AUTO_INCREMENT, " +
@@ -30,7 +29,7 @@ public class UserDaoHibernateImpl implements UserDao {
                     "age TINYINT NOT NULL, " +
                     "PRIMARY KEY (id)); ";
             session.createNativeQuery(sql).executeUpdate();
-            session.getTransaction().commit();
+            transaction.commit();
         } catch (Exception e) {
             System.out.println("Ошибка создания таблицы. " + e);
             transaction.rollback();
@@ -39,11 +38,11 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void dropUsersTable() {
-        try {
+        try (Session session = Util.getSessionFactory().openSession()){
             transaction = session.beginTransaction();
             String sql = "DROP TABLE IF EXISTS Users;";
             session.createNativeQuery(sql).executeUpdate();
-            session.getTransaction().commit();
+            transaction.commit();
         } catch (Exception e) {
             System.out.println("Ошибка уделения таблицы. " + e);
             transaction.rollback();
@@ -55,31 +54,30 @@ public class UserDaoHibernateImpl implements UserDao {
         EntityManager entityManager = Util.getSessionFactory().openSession();
         ;
         EntityTransaction entityTransaction = entityManager.getTransaction();
-        try {
-            String sql = "INSERT INTO Users (name, lastName, age) values (?,?,?)";
-            entityTransaction.begin();
-            entityManager.createNativeQuery(sql)
-                    .setParameter(1, name)
-                    .setParameter(2, lastName)
-                    .setParameter(3, age)
-                    .executeUpdate();
-            entityTransaction.commit();
+        try (Session session = Util.getSessionFactory().openSession()){
+            transaction = session.beginTransaction();
+            session.persist(new User(name,lastName,age));
+//            String sql = " INSERT INTO Users (name, lastName, age) values (:name,:lastname,:age)";
+//            Query<User> query = session.createNativeQuery(sql,User.class);
+//            query.setParameter("name", name);
+//            query.setParameter("lastname", lastName);
+//            query.setParameter("age", age);
+//            query.executeUpdate();
+            transaction.commit();
             System.out.printf("User с именем – %s добавлен в базу данных.\n", name);
         } catch (Exception e) {
             System.out.println("Ошибка добавления User в БД. " + e);
-            entityTransaction.rollback();
-        } finally {
-            entityManager.close();
+            transaction.rollback();
         }
     }
 
     @Override
     public void removeUserById(long id) {
-        try {
+        try (Session session = Util.getSessionFactory().openSession()){
             transaction = session.beginTransaction();
-            String sql = "DELETE FROM Users WHERE ID=" + id + ";";
+            String sql = "DELETE FROM Users WHERE id=" + id;
             session.createNativeQuery(sql).executeUpdate();
-            session.getTransaction().commit();
+            transaction.commit();
         } catch (Exception e) {
             System.out.println("Ошибка уделения User с id=" + id + " из БД. " + e);
             transaction.rollback();
@@ -89,20 +87,11 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public List<User> getAllUsers() {
         List<User> users = new ArrayList<>();
-        try {
+        try (Session session = Util.getSessionFactory().openSession()){
             transaction = session.beginTransaction();
-            String sql = "SELECT * FROM Users";
-            List<Object[]> rows = session.createNativeQuery(sql).getResultList();
-            for(Object[] row : rows) {
-                long id = ((BigInteger) row[0]).longValue();
-                String name = (String) row[1];
-                String lastName = (String) row[2];
-                byte age = (byte) row[3];
-                User user = new User(name, lastName, age);
-                user.setId(id);
-                users.add(user);
-            }
-            session.getTransaction().commit();
+            String sql = "from User";
+            users = session.createQuery(sql, User.class).getResultList();
+            transaction.commit();
         } catch (Exception e) {
             System.out.println("Ошибка получения списка Users. " + e);
             transaction.rollback();
@@ -112,11 +101,11 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void cleanUsersTable() {
-        try {
+        try (Session session = Util.getSessionFactory().openSession()){
             transaction = session.beginTransaction();
             String sql = "TRUNCATE TABLE Users;";
             session.createNativeQuery(sql).executeUpdate();
-            session.getTransaction().commit();
+            transaction.commit();
         } catch (Exception e) {
             System.out.println("Ошибка очистки данных в таблице. " + e);
             transaction.rollback();

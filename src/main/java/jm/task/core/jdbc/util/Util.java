@@ -55,6 +55,7 @@ public class Util {
                 settings.put(Environment.SHOW_SQL, true);
 
                 configuration.setProperties(settings);
+                configuration.addAnnotatedClass(User.class);
 
                 serviceRegistry = new StandardServiceRegistryBuilder()
                         .applySettings(configuration.getProperties()).build();

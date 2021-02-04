@@ -71,7 +71,7 @@ public class UserDaoJDBCImpl implements UserDao {
         PreparedStatement preparedStmt = null;
         try {
             savepoint = conn.setSavepoint("SavepointSaveUser");
-            String sql = "INSERT INTO Users (name, lastName, age) values (?,?,?);";
+            String sql = "INSERT INTO Users (name, lastName, age) values (?,?,?)";
             preparedStmt = conn.prepareStatement(sql);
             preparedStmt.setString(1, name);
             preparedStmt.setString(2, lastName);
