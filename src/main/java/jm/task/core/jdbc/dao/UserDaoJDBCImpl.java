@@ -2,6 +2,7 @@ package jm.task.core.jdbc.dao;
 
 import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.util.Util;
+import org.hibernate.annotations.NamedQuery;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -69,6 +70,7 @@ public class UserDaoJDBCImpl implements UserDao {
 
     public void saveUser(String name, String lastName, byte age) {
         PreparedStatement preparedStmt = null;
+
         try {
             savepoint = conn.setSavepoint("SavepointSaveUser");
             String sql = "INSERT INTO Users (name, lastName, age) values (?,?,?)";
